@@ -3,9 +3,21 @@ from bs4 import BeautifulSoup
 import random
 import os
 url = input("Ingresa una URL: ")
-def detectar_cms(url):
+def quitarDirectorio(url):
+    # Verificar si la URL contiene un directorio
+    if '/' in url:
+        # Dividir la URL en partes usando '/'
+        partes = url.split('/')
+        # Tomar la primera parte (la URL original)
+        url_original = partes[0] + '//' + partes[2]
+        return url_original
+    else:
+        # Si no hay directorio, devolver la URL tal cual
+        return url_original
+url = (quitarDirectorio(url))
+def detectarCMS(url):
     try:
-        print(os.getcwd())
+
         # Realiza una solicitud HTTP GET a la URL
         response = requests.get(url)
         response.raise_for_status()  # Asegura que la solicitud fue exitosa
@@ -31,5 +43,5 @@ def detectar_cms(url):
     except requests.RequestException as error:
         print(f"Error al solicitar la URL: {error}")
         return None
-cms = detectar_cms(url)
+cms = detectarCMS(url)
 print(cms)
