@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import random
-import os
+import re
 url = input("Ingresa una URL: ")
 def quitarDirectorio(url):
     # Verificar si la URL contiene un directorio
@@ -38,6 +38,8 @@ def detectarCMS(url):
                 response = requests.get(urlDestino)
                 if response.status_code == 200:
                     return 'WordPress'
+        if soup.find('meta', {'name': 'generator', 'content': re.compile(r'Drupal ')}) or 'Drupal' in response.text:
+            return 'Drupal'
         # Si no se detecta ningún CMS conocido
         return 'no esta programado para detectar el CMS de esta pagina'
     except requests.RequestException as error:
