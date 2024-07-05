@@ -20,7 +20,6 @@ def detectarCMS(url):
 
         # Realiza una solicitud HTTP GET a la URL
         response = requests.get(url)
-        print(response.text)
         response.raise_for_status()  # Asegura que la solicitud fue exitosa
 
         # Analiza el contenido HTML de la página
