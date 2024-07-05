@@ -40,6 +40,16 @@ def detectarCMS(url):
                     return 'WordPress'
         if soup.find('meta', {'name': 'generator', 'content': re.compile(r'Drupal ')}) or 'sites/default' in response.text:
             return 'Drupal'
+        else: 
+            with open('DrupalDirectorios.txt', 'r') as file:
+                urls = file.readlines()
+            urlsSeleccionadas = random.sample(urls, 30)
+            for pruebaUrl in urlsSeleccionadas:
+                pruebaUrl = pruebaUrl.strip()  # Eliminar espacios en blanco al principio y al final
+                urlDestino = url + '/' + pruebaUrl
+                response = requests.get(urlDestino)
+                if response.history[0].status_code == 200:
+                    return 'Drupal'
         # Si no se detecta ningún CMS conocido
         return 'no esta programado para detectar el CMS de esta pagina'
     except requests.RequestException as error:
