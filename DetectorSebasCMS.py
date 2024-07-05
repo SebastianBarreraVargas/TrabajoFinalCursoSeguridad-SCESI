@@ -20,6 +20,7 @@ def detectarCMS(url):
 
         # Realiza una solicitud HTTP GET a la URL
         response = requests.get(url)
+        print(response.text)
         response.raise_for_status()  # Asegura que la solicitud fue exitosa
 
         # Analiza el contenido HTML de la página
@@ -38,7 +39,7 @@ def detectarCMS(url):
                 response = requests.get(urlDestino)
                 if response.status_code == 200:
                     return 'WordPress'
-        if soup.find('meta', {'name': 'generator', 'content': re.compile(r'Drupal ')}) or 'Drupal' in response.text:
+        if soup.find('meta', {'name': 'generator', 'content': re.compile(r'Drupal ')}) or 'sites/default' in response.text:
             return 'Drupal'
         # Si no se detecta ningún CMS conocido
         return 'no esta programado para detectar el CMS de esta pagina'
