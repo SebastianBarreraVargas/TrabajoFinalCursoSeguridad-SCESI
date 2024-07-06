@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import random
 import re
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3', 'Referer': 'https://www.google.com'}
 url = input("Ingresa una URL: ")
 def quitarDirectorio(url):
     # Verificar si la URL contiene un directorio
@@ -19,7 +20,7 @@ def detectarCMS(url):
     try:
 
         # Realiza una solicitud HTTP GET a la URL
-        response = requests.get(url)
+        response = requests.get(url, allow_redirects=False, headers = headers)
         response.raise_for_status()  # Asegura que la solicitud fue exitosa
 
         # Analiza el contenido HTML de la página
@@ -48,7 +49,7 @@ def detectarCMS(url):
                 pruebaUrl = pruebaUrl.strip()  # Eliminar espacios en blanco al principio y al final
                 urlDestino = url + '/' + pruebaUrl
                 response = requests.get(urlDestino)
-                if response.history[0].status_code == 200:
+                if response.status_code == 200:
                     return 'Drupal'
         # Si no se detecta ningún CMS conocido
         return 'no esta programado para detectar el CMS de esta pagina'
