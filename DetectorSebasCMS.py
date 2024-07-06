@@ -24,7 +24,7 @@ def detectarCMS(url):
         response.raise_for_status()  # Asegura que la solicitud fue exitosa
 
         # Analiza el contenido HTML de la página
-        soup = BeautifulSoup(response.content, 'html.parser')
+        soup = BeautifulSoup(response.content,'html.parser')
         # Busca pistas específicas en el contenido HTML para identificar el CMS
         # Detectar WordPress
         if soup.find('meta', {'name': 'generator', 'content': 'WordPress'}) or 'wp-content' in response.text:
@@ -59,6 +59,8 @@ def detectarCMS(url):
                 else:
                     if response.status_code == 200:
                         return 'Drupal'
+        if 'joomla' in response.text:
+            return 'Joomla'
         # Si no se detecta ningún CMS conocido
         return 'no esta programado para detectar el CMS de esta pagina'
     except requests.RequestException as error:
