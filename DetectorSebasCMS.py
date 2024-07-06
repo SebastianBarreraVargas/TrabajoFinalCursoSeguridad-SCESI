@@ -38,10 +38,10 @@ def detectarCMS(url):
                 urlDestino = url + '/' + pruebaUrl
                 response = requests.get(urlDestino)
                 if response.history:
-                    if response.status_code == 200:
+                    if response.history[0].status_code == 200:
                         return 'WordPress'
                 else:
-                    if response.history[0].status_code == 200:
+                    if response.status_code == 200:
                         return 'WordPress'
         if soup.find('meta', {'name': 'generator', 'content': re.compile(r'Drupal ')}) or 'sites/default' in response.text:
             return 'Drupal'
@@ -54,10 +54,10 @@ def detectarCMS(url):
                 urlDestino = url + '/' + pruebaUrl
                 response = requests.get(urlDestino)
                 if response.history:
-                    if response.status_code == 200:
+                    if response.history[0].status_code == 200:
                         return 'Drupal'
                 else:
-                    if response.history[0].status_code == 200:
+                    if response.status_code == 200:
                         return 'Drupal'
         # Si no se detecta ningún CMS conocido
         return 'no esta programado para detectar el CMS de esta pagina'
