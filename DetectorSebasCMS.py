@@ -2,6 +2,8 @@ import requests
 from bs4 import BeautifulSoup
 import random
 import re
+import http.cookiejar
+cookie_jar = http.cookiejar.CookieJar()
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3', 'Referer': 'https://www.google.com'}
 url = input("Ingresa una URL: ")
 def quitarDirectorio(url):
@@ -20,7 +22,7 @@ def detectarCMS(url):
     try:
 
         # Realiza una solicitud HTTP GET a la URL
-        response = requests.get(url, allow_redirects=False, headers = headers)
+        response = requests.get(url, allow_redirects=False, headers = headers, cookies=cookie_jar)
         response.raise_for_status()  # Asegura que la solicitud fue exitosa
 
         # Analiza el contenido HTML de la página
