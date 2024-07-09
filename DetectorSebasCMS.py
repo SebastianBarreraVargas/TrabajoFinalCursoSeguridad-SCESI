@@ -4,10 +4,7 @@ import random
 import re
 session = requests.Session()
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3', 
-           'Referer': 'https://www.google.com',
-            'Accept-Language': 'en-US,en;q=0.9',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Connection': 'keep-alive'}
+           'Referer': 'https://www.google.com'}
 url = input("Ingresa una URL: ")
 def quitarDirectorio(url):
     # Verificar si la URL contiene un directorio
@@ -26,7 +23,7 @@ def detectarCMS(url):
 
         # Realiza una solicitud HTTP GET a la URL
         response = session.get(url, allow_redirects=False, headers = headers)
-        print(response.text)
+        print(response)
         response.raise_for_status()  # Asegura que la solicitud fue exitosa
 
         # Analiza el contenido HTML de la página
@@ -42,13 +39,14 @@ def detectarCMS(url):
             for pruebaUrl in urlsSeleccionadas:
                 pruebaUrl = pruebaUrl.strip()  # Eliminar espacios en blanco al principio y al final
                 urlDestino = url + '/' + pruebaUrl
-                response = requests.get(urlDestino)
+                response = requests.get(urlDestino, allow_redirects=False, headers = headers)
                 if response.history:
                     if response.history[0].status_code == 200:
                         return 'WordPress'
                 else:
                     if response.status_code == 200:
                         return 'WordPress'
+        response = session.get(url, allow_redirects=False, headers = headers)
         if soup.find('meta', {'name': 'generator', 'content': re.compile(r'Drupal ')}) or 'sites/default' in response.text:
             return 'Drupal'
         else: 
@@ -58,7 +56,7 @@ def detectarCMS(url):
             for pruebaUrl in urlsSeleccionadas:
                 pruebaUrl = pruebaUrl.strip()  # Eliminar espacios en blanco al principio y al final
                 urlDestino = url + '/' + pruebaUrl
-                response = requests.get(urlDestino)
+                response = requests.get(urlDestino, allow_redirects=False, headers = headers)
                 if response.history:
                     if response.history[0].status_code == 200:
                         return 'Drupal'
