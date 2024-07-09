@@ -68,6 +68,20 @@ def detectarCMS(url):
         response = session.get(url, allow_redirects=False, headers = headers)
         if soup.find('meta', {'name': 'generator', 'content': re.compile(r'Joomla')}):
             return 'Joomla'
+        else: 
+            with open('JoomlaDirectorios.txt', 'r') as file:
+                urls = file.readlines()
+            urlsSeleccionadas = random.sample(urls, 30)
+            for pruebaUrl in urlsSeleccionadas:
+                pruebaUrl = pruebaUrl.strip()  # Eliminar espacios en blanco al principio y al final
+                urlDestino = url + '/' + pruebaUrl
+                response = requests.get(urlDestino, allow_redirects=False, headers = headers)
+                if response.history:
+                    if response.history[0].status_code == 200:
+                        return 'Joomla'
+                else:
+                    if response.status_code == 200:
+                        return 'Joomla'
         # Si no se detecta ningún CMS conocido
         return 'no esta programado para detectar el CMS de esta pagina'
     except requests.RequestException as error:
