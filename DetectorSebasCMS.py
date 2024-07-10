@@ -86,6 +86,9 @@ def detectarCMS(url):
         # Si no se detecta ningún CMS conocido
         return 'no esta programado para detectar el CMS de esta pagina'
     except requests.RequestException as error:
+        if requests.exceptions.SSLError:
+            print('Porfavor use el modo sin verificacion de certificados')
+            return None
         print(f"Error al solicitar la URL: {error}")
         return None
 cms = detectarCMS(url)
