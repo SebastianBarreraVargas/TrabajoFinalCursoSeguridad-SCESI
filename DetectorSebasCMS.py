@@ -4,7 +4,6 @@ import random
 import re
 session = requests.Session()
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3', 
-           'Referer': 'https://www.google.com',
             'Accept-Language': 'en-US,en;q=0.9',
             'Connection': 'keep-alive'}
 url = input("Ingresa una URL: ")
@@ -25,7 +24,6 @@ def detectarCMS(url):
 
         # Realiza una solicitud HTTP GET a la URL
         response = session.get(url, allow_redirects=False, headers = headers)
-        print(response.text)
         response.raise_for_status()  # Asegura que la solicitud fue exitosa
 
         # Analiza el contenido HTML de la página
@@ -41,7 +39,7 @@ def detectarCMS(url):
             for pruebaUrl in urlsSeleccionadas:
                 pruebaUrl = pruebaUrl.strip()  # Eliminar espacios en blanco al principio y al final
                 urlDestino = url + '/' + pruebaUrl
-                response = requests.get(urlDestino, allow_redirects=False, headers = headers)
+                response = session.get(urlDestino, allow_redirects=False, headers=headers)
                 if response.history:
                     if response.history[0].status_code == 200:
                         return 'WordPress'
