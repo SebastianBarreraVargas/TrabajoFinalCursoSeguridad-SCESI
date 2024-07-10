@@ -23,7 +23,7 @@ def detectarCMS(url):
     try:
 
         # Realiza una solicitud HTTP GET a la URL
-        response = session.get(url, allow_redirects=False, headers = headers)
+        response = session.get(url, allow_redirects=False, headers = headers, verify=False)
         response.raise_for_status()  # Asegura que la solicitud fue exitosa
 
         # Analiza el contenido HTML de la página
@@ -39,14 +39,14 @@ def detectarCMS(url):
             for pruebaUrl in urlsSeleccionadas:
                 pruebaUrl = pruebaUrl.strip()  # Eliminar espacios en blanco al principio y al final
                 urlDestino = url + '/' + pruebaUrl
-                response = session.get(urlDestino, allow_redirects=False, headers=headers)
+                response = session.get(urlDestino, allow_redirects=False, headers=headers, verify=False)
                 if response.history:
                     if response.history[0].status_code == 200:
                         return 'WordPress'
                 else:
                     if response.status_code == 200:
                         return 'WordPress'
-        response = session.get(url, allow_redirects=False, headers = headers)
+        response = session.get(url, allow_redirects=False, headers = headers, verify=False)
         if soup.find('meta', {'name': 'generator', 'content': re.compile(r'Drupal ')}) or 'sites/default' in response.text:
             return 'Drupal'
         else: 
@@ -56,14 +56,14 @@ def detectarCMS(url):
             for pruebaUrl in urlsSeleccionadas:
                 pruebaUrl = pruebaUrl.strip()  # Eliminar espacios en blanco al principio y al final
                 urlDestino = url + '/' + pruebaUrl
-                response = requests.get(urlDestino, allow_redirects=False, headers = headers)
+                response = requests.get(urlDestino, allow_redirects=False, headers = headers, verify=False)
                 if response.history:
                     if response.history[0].status_code == 200:
                         return 'Drupal'
                 else:
                     if response.status_code == 200:
                         return 'Drupal'
-        response = session.get(url, allow_redirects=False, headers = headers)
+        response = session.get(url, allow_redirects=False, headers = headers, verify=False)
         if soup.find('meta', {'name': 'generator', 'content': re.compile(r'Joomla')}):
             return 'Joomla'
         else: 
@@ -73,7 +73,7 @@ def detectarCMS(url):
             for pruebaUrl in urlsSeleccionadas:
                 pruebaUrl = pruebaUrl.strip()  # Eliminar espacios en blanco al principio y al final
                 urlDestino = url + '/' + pruebaUrl
-                response = requests.get(urlDestino, allow_redirects=False, headers = headers)
+                response = requests.get(urlDestino, allow_redirects=False, headers = headers, verify=False)
                 if response.history:
                     if response.history[0].status_code == 200:
                         return 'Joomla'
