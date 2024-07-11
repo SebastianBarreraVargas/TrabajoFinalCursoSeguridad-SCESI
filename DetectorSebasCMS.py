@@ -93,6 +93,9 @@ def detectarCMS(url):
                 response = requests.get(urlDestino, allow_redirects=True, headers = headers, verify=True)
                 if 'ghost.io'in response.url:
                         return 'Ghost'
+        response = session.get(url, allow_redirects=False, headers = headers, verify=True)
+        if soup.find('meta', {'name': 'generator', 'content': re.compile(r'Wix')}):
+            return 'Wix'
         # Si no se detecta ningún CMS conocido
         return 'no esta programado para detectar el CMS de esta pagina'
     except requests.RequestException as error:
