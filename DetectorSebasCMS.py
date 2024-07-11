@@ -83,6 +83,16 @@ def detectarCMS(url):
         response = session.get(url, allow_redirects=False, headers = headers, verify=True)
         if soup.find('meta', {'name': 'generator', 'content': re.compile(r'Ghost')}):
             return 'Ghost'
+        else:
+            with open('GhostDirectorios.txt', 'r') as file:
+                urls = file.readlines()
+            urlsSeleccionadas = random.sample(urls, 30)
+            for pruebaUrl in urlsSeleccionadas:
+                pruebaUrl = pruebaUrl.strip()  # Eliminar espacios en blanco al principio y al final
+                urlDestino = url + '/' + pruebaUrl
+                response = requests.get(urlDestino, allow_redirects=True, headers = headers, verify=True)
+                if 'ghost.io'in response.url:
+                        return 'Ghost'
         # Si no se detecta ningún CMS conocido
         return 'no esta programado para detectar el CMS de esta pagina'
     except requests.RequestException as error:
