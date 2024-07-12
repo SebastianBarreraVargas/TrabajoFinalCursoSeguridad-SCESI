@@ -16226,7 +16226,6 @@ core/.yarnrc.yml
 autoload.php
 .ht.router.php
 update.php
-.gitlab-ci/pipeline.yml
 .gitlab-ci/pipeline-test-only.yml
 .gitlab-ci/scripts/server-setup.sh
 .gitlab-ci/scripts/test-only.sh
