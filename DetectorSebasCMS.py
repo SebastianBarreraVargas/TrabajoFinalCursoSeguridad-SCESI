@@ -24,12 +24,17 @@ def detectarCMS(url):
 
         # Realiza una solicitud HTTP GET a la URL
         response = session.get(url, allow_redirects=False, headers = headers, verify=True)
-        response.raise_for_status()  # Asegura que la solicitud fue exitosa
-
-        # Analiza el contenido HTML de la página
-        soup = BeautifulSoup(response.content,'html.parser')
+        response.raise_for_status()  # Asegura que la solicitud fue exitosa, solo se realiza una vez para asegurar que la pagina exista
         print('Analizando WordPress')
-        if soup.find('meta', {'name': 'generator', 'content': 'WordPress'}):
+        #Analiza robots.txt
+        urlRobots = url + '/' + 'robots.txt'
+        response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=True)
+        if 'wp-' in response.text or re.search('WordPress', response.text, re.IGNORECASE):
+            return 'WordPress'
+        # Analiza el contenido HTML de la página
+        response = session.get(url, allow_redirects=False, headers = headers, verify=True)
+        soup = BeautifulSoup(response.content,'html.parser')
+        if soup.find('meta', {'name': 'generator', 'content': re.compile(r'WordPress ')}):
             return 'WordPress'
         else: 
             with open('WordPressDirectorios.txt', 'r') as file:
@@ -46,6 +51,12 @@ def detectarCMS(url):
                     if response.status_code == 200:
                         return 'WordPress'
         print('Analizando Drupal')
+
+        urlRobots = url + '/' + 'robots.txt'
+        response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=True)
+        if 'core' in response.text or '.gitlab-ci' in response.text or 'composer' in response.text:
+            return 'Drupal'
+        
         response = session.get(url, allow_redirects=False, headers = headers, verify=True)
         if soup.find('meta', {'name': 'generator', 'content': re.compile(r'Drupal ')}) or 'sites/default' in response.text:
             return 'Drupal'
@@ -64,6 +75,21 @@ def detectarCMS(url):
                     if response.status_code == 200:
                         return 'Drupal'
         print('Analizando Joomla')
+
+        urlRobots = url + '/' + 'robots.txt'
+        response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=True)
+        with open('JoomlaRobots.txt', 'r') as file:
+            textoPrueba = file.readlines()
+        for palabrasClave in textoPrueba:
+            palabrasClave = palabrasClave.strip()
+            if palabrasClave in response.text:
+                return 'Joomla'
+        
+        urlRobots = url + '/' + 'robots.txt'
+        response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=True)
+        if 'core' in response.text or '.gitlab-ci' in response.text or 'composer' in response.text:
+            return 'Joomla'
+        
         response = session.get(url, allow_redirects=False, headers = headers, verify=True)
         if soup.find('meta', {'name': 'generator', 'content': re.compile(r'Joomla')}):
             return 'Joomla'
@@ -82,6 +108,12 @@ def detectarCMS(url):
                     if response.status_code == 200:
                         return 'Joomla'
         print('Analizando Ghost')
+
+        urlRobots = url + '/' + 'robots.txt'
+        response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=True)
+        if re.search('Ghost', response.text, re.IGNORECASE):
+            return 'Ghost'
+
         response = session.get(url, allow_redirects=False, headers = headers, verify=True)
         if soup.find('meta', {'name': 'generator', 'content': re.compile(r'Ghost')}):
             return 'Ghost'
@@ -96,6 +128,16 @@ def detectarCMS(url):
                 if 'ghost.io'in response.url:
                         return 'Ghost'
         print('Analizando PrestaShop')
+
+        urlRobots = url + '/' + 'robots.txt'
+        response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=True)
+        with open('PrestaShopRobots.txt', 'r') as file:
+            textoPrueba = file.readlines()
+        for palabrasClave in textoPrueba:
+            palabrasClave = palabrasClave.strip()
+            if palabrasClave in response.text:
+                return 'PrestaShop'
+
         response = session.get(url, allow_redirects=False, headers = headers, verify=True)
         if soup.find('meta', {'name': 'generator', 'content': re.compile(r'PrestaShop')}) or re.search('prestashop', response.text, re.IGNORECASE):
             return 'PrestaShop'
