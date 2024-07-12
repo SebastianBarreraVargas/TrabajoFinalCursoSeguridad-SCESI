@@ -28,9 +28,8 @@ def detectarCMS(url):
 
         # Analiza el contenido HTML de la página
         soup = BeautifulSoup(response.content,'html.parser')
-        # Busca pistas específicas en el contenido HTML para identificar el CMS
-        # Detectar WordPress
-        if soup.find('meta', {'name': 'generator', 'content': 'WordPress'}) or 'wp-content' in response.text:
+        print('Analizando WordPress')
+        if soup.find('meta', {'name': 'generator', 'content': 'WordPress'}):
             return 'WordPress'
         else: 
             with open('WordPressDirectorios.txt', 'r') as file:
@@ -46,6 +45,7 @@ def detectarCMS(url):
                 else:
                     if response.status_code == 200:
                         return 'WordPress'
+        print('Analizando Drupal')
         response = session.get(url, allow_redirects=False, headers = headers, verify=True)
         if soup.find('meta', {'name': 'generator', 'content': re.compile(r'Drupal ')}) or 'sites/default' in response.text:
             return 'Drupal'
@@ -63,6 +63,7 @@ def detectarCMS(url):
                 else:
                     if response.status_code == 200:
                         return 'Drupal'
+        print('Analizando Joomla')
         response = session.get(url, allow_redirects=False, headers = headers, verify=True)
         if soup.find('meta', {'name': 'generator', 'content': re.compile(r'Joomla')}):
             return 'Joomla'
@@ -80,6 +81,7 @@ def detectarCMS(url):
                 else:
                     if response.status_code == 200:
                         return 'Joomla'
+        print('Analizando Ghost')
         response = session.get(url, allow_redirects=False, headers = headers, verify=True)
         if soup.find('meta', {'name': 'generator', 'content': re.compile(r'Ghost')}):
             return 'Ghost'
@@ -93,8 +95,9 @@ def detectarCMS(url):
                 response = requests.get(urlDestino, allow_redirects=False, headers = headers, verify=True)
                 if 'ghost.io'in response.url:
                         return 'Ghost'
+        print('Analizando PrestaShop')
         response = session.get(url, allow_redirects=False, headers = headers, verify=True)
-        if soup.find('meta', {'name': 'generator', 'content': re.compile(r'PrestaShop')}):
+        if soup.find('meta', {'name': 'generator', 'content': re.compile(r'PrestaShop')}) or re.search('prestashop', response.text, re.IGNORECASE):
             return 'PrestaShop'
         else:
             with open('PrestaShopDirectorios.txt', 'r') as file:
