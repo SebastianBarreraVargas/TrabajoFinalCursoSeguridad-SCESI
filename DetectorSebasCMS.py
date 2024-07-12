@@ -90,18 +90,29 @@ def detectarCMS(url):
             for pruebaUrl in urlsSeleccionadas:
                 pruebaUrl = pruebaUrl.strip()  # Eliminar espacios en blanco al principio y al final
                 urlDestino = url + '/' + pruebaUrl
-                response = requests.get(urlDestino, allow_redirects=True, headers = headers, verify=True)
+                response = requests.get(urlDestino, allow_redirects=False, headers = headers, verify=True)
                 if 'ghost.io'in response.url:
                         return 'Ghost'
         response = session.get(url, allow_redirects=False, headers = headers, verify=True)
         if soup.find('meta', {'name': 'generator', 'content': re.compile(r'PrestaShop')}):
             return 'PrestaShop'
+        else:
+            with open('PrestaShopDirectorios.txt', 'r') as file:
+                urls = file.readlines()
+            urlsSeleccionadas = random.sample(urls, 30)
+            for pruebaUrl in urlsSeleccionadas:
+                pruebaUrl = pruebaUrl.strip()  # Eliminar espacios en blanco al principio y al final
+                urlDestino = url + '/' + pruebaUrl
+                response = requests.get(urlDestino, allow_redirects=False, headers = headers, verify=True)
+                if response.history:
+                    if response.history[0].status_code == 200:
+                        return 'PrestaShop'
+                else:
+                    if response.status_code == 200:
+                        return 'PrestaShop'
         # Si no se detecta ningún CMS conocido
         return 'no esta programado para detectar el CMS de esta pagina'
     except requests.RequestException as error:
-        if requests.exceptions.SSLError:
-            print('Porfavor use el modo sin verificacion de certificados')
-            return None
         print(f"Error al solicitar la URL: {error}")
         return None
 cms = detectarCMS(url)
