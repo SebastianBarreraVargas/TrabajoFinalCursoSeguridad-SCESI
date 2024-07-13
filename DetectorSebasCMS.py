@@ -25,7 +25,14 @@ def detectarCMS(url):
         # Realiza una solicitud HTTP GET a la URL
         response = session.get(url, allow_redirects=False, headers = headers, verify=True)
         response.raise_for_status()  # Asegura que la solicitud fue exitosa, solo se realiza una vez para asegurar que la pagina exista
+        cabeceras_de_respuesta =  response.headers
         print('Analizando WordPress')
+        print(cabeceras_de_respuesta)
+        #Analisis Cabeceras
+        if 'Link' in cabeceras_de_respuesta and 'rel="https://api.w.org/' in cabeceras_de_respuesta['Link']:
+            print('Posible uso de WordPress')
+        elif 'X-Redirect-By' in cabeceras_de_respuesta and 'WordPress' in cabeceras_de_respuesta['X-Redirect-By']:
+            print('Posible uso de WordPress')
         #Analiza robots.txt
         urlRobots = url + '/' + 'robots.txt'
         response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=True)
@@ -51,7 +58,11 @@ def detectarCMS(url):
                     if response.status_code == 200:
                         return 'WordPress'
         print('Analizando Drupal')
-
+        #Analisis Cabeceras
+        if 'x-generators' in cabeceras_de_respuesta and 'Drupal' in cabeceras_de_respuesta['x-generator']:
+            print('Posible uso de Drupal')
+        elif 'x-drupal-dynamic-cache' in cabeceras_de_respuesta or 'x-drupal-cache' in cabeceras_de_respuesta:
+            print('Posible uso de Drupal')
         urlRobots = url + '/' + 'robots.txt'
         response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=True)
         if 'core' in response.text or '.gitlab-ci' in response.text or 'composer' in response.text:
@@ -75,6 +86,11 @@ def detectarCMS(url):
                     if response.status_code == 200:
                         return 'Drupal'
         print('Analizando Joomla')
+        #Analisis cabeceras
+        if 'X-Content-Encoded-By' in cabeceras_de_respuesta and re.search('joomla', cabeceras_de_respuesta['X-Content-Encoded-By'], re.IGNORECASE):
+            print('Posible uso de Joomla')
+        elif 'X-Powered-By' in cabeceras_de_respuesta and re.search('joomla', cabeceras_de_respuesta['X-Powered-By'], re.IGNORECASE):
+            print('Posible uso de Joomla')
 
         urlRobots = url + '/' + 'robots.txt'
         response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=True)
@@ -108,6 +124,9 @@ def detectarCMS(url):
                     if response.status_code == 200:
                         return 'Joomla'
         print('Analizando Ghost')
+        #Analisis cabeceras
+        if 'X-Powered-By' in cabeceras_de_respuesta and re.search('ghost', cabeceras_de_respuesta['X-Powered-By'], re.IGNORECASE):
+            print('Posible uso de Ghost')
 
         urlRobots = url + '/' + 'robots.txt'
         response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=True)
@@ -128,6 +147,11 @@ def detectarCMS(url):
                 if 'ghost.io'in response.url:
                         return 'Ghost'
         print('Analizando PrestaShop')
+        #Analisis Cabeceras
+        if 'X-Powered-By' in cabeceras_de_respuesta and re.search('prestashop', cabeceras_de_respuesta['X-Powered-By'], re.IGNORECASE):
+            print('Posible uso de PrestaShop')
+        elif 'X-PrestaShop' in cabeceras_de_respuesta:
+            print('Posible uso de PrestaShop')
 
         urlRobots = url + '/' + 'robots.txt'
         response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=True)
