@@ -33,6 +33,10 @@ def detectarCMS(url):
             print('Posible uso de WordPress')
         elif 'X-Redirect-By' in cabeceras_de_respuesta and 'WordPress' in cabeceras_de_respuesta['X-Redirect-By']:
             print('Posible uso de WordPress')
+        elif 'X-Powered-By' in cabeceras_de_respuesta and re.search('wordpress', cabeceras_de_respuesta['X-Powered-By'], re.IGNORECASE):
+            print('Posible uso de WordPress')
+        elif 'X-Powered-By' in cabeceras_de_respuesta and re.search('wp', cabeceras_de_respuesta['X-Powered-By'], re.IGNORECASE):
+            print('Posible uso de WordPress')
         #Analiza robots.txt
         urlRobots = url + '/' + 'robots.txt'
         response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=True)
