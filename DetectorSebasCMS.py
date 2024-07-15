@@ -63,15 +63,23 @@ def detectarCMS(url):
                         return 'WordPress'
         print('Analizando Drupal')
         #Analisis Cabeceras
-        if 'x-generators' in cabeceras_de_respuesta and 'Drupal' in cabeceras_de_respuesta['x-generator']:
+        drupal_cabeceras = [
+            'X-Drupal-Cache', 'X-Drupal-Dynamic-Cache', 'X-Drupal-Cache-Contexts',
+            'X-Drupal-Cache-Tags', 'X-Drupal-Cache-Max-Age', 'X-Drupal-Fast-404', 'X-Drupal-Route-Normalizer',
+            'X-Drupal-Quickedit', 'X-Drupal-Regions', 'X-Drupal-Theme', 'X-Drupal-Site'
+        ]
+        if 'x-generator' in cabeceras_de_respuesta and 'Drupal' in cabeceras_de_respuesta['x-generator']:
             print('Posible uso de Drupal')
-        elif 'x-drupal-dynamic-cache' in cabeceras_de_respuesta or 'x-drupal-cache' in cabeceras_de_respuesta:
-            print('Posible uso de Drupal')
+        else:
+            marcador = 1
+            for cabeceras in drupal_cabeceras:
+                if cabeceras in cabeceras_de_respuesta and marcador == 1:
+                    print('Posible uso de Drupal')
+                    marcador = 0
         urlRobots = url + '/' + 'robots.txt'
         response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=True)
         if 'core' in response.text or '.gitlab-ci' in response.text or 'composer' in response.text:
             return 'Drupal'
-        
         response = session.get(url, allow_redirects=False, headers = headers, verify=True)
         if soup.find('meta', {'name': 'generator', 'content': re.compile(r'Drupal ')}) or 'sites/default' in response.text:
             return 'Drupal'
