@@ -66,8 +66,7 @@ def detectarCMS(url):
         drupal_cabeceras = [
             'X-Drupal-Cache', 'X-Drupal-Dynamic-Cache', 'X-Drupal-Cache-Contexts',
             'X-Drupal-Cache-Tags', 'X-Drupal-Cache-Max-Age', 'X-Drupal-Fast-404', 'X-Drupal-Route-Normalizer',
-            'X-Drupal-Quickedit', 'X-Drupal-Regions', 'X-Drupal-Theme', 'X-Drupal-Site'
-        ]
+            'X-Drupal-Quickedit', 'X-Drupal-Regions', 'X-Drupal-Theme', 'X-Drupal-Site']
         if 'x-generator' in cabeceras_de_respuesta and 'Drupal' in cabeceras_de_respuesta['x-generator']:
             print('Posible uso de Drupal')
         else:
@@ -103,6 +102,10 @@ def detectarCMS(url):
             print('Posible uso de Joomla')
         elif 'X-Powered-By' in cabeceras_de_respuesta and re.search('joomla', cabeceras_de_respuesta['X-Powered-By'], re.IGNORECASE):
             print('Posible uso de Joomla')
+        elif 'X-Generator' in cabeceras_de_respuesta and re.search('joomla', cabeceras_de_respuesta['X-Generator'], re.IGNORECASE):
+            print('Posible uso de Joomla')
+        elif 'X-Joomla-Cache' in cabeceras_de_respuesta:
+            print('Posible uso de Drupal')
 
         urlRobots = url + '/' + 'robots.txt'
         response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=True)
