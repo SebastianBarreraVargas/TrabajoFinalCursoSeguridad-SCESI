@@ -170,11 +170,12 @@ def detectarCMS(url):
                         return 'Ghost'
         print('Analizando PrestaShop')
         #Analisis Cabeceras
-        if 'X-Powered-By' in cabeceras_de_respuesta and re.search('prestashop', cabeceras_de_respuesta['X-Powered-By'], re.IGNORECASE):
+        if 'Powered-By' in cabeceras_de_respuesta and re.search('prestashop', cabeceras_de_respuesta['Powered-By'], re.IGNORECASE):
             print('Posible uso de PrestaShop')
         elif 'X-PrestaShop' in cabeceras_de_respuesta:
             print('Posible uso de PrestaShop')
-
+        elif 'Set-Cookie' in cabeceras_de_respuesta and re.search('prestashop', cabeceras_de_respuesta['Set-Cookie'], re.IGNORECASE):
+            print('Posible uso de PrestaShop')
         urlRobots = url + '/' + 'robots.txt'
         response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=True)
         with open('PrestaShopRobots.txt', 'r') as file:
