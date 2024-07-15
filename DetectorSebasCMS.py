@@ -140,8 +140,15 @@ def detectarCMS(url):
                         return 'Joomla'
         print('Analizando Ghost')
         #Analisis cabeceras
+        ghost_cabeceras = ['Ghost-Age', 'Ghost-Cache', 'Ghost-Fastly']
         if 'X-Powered-By' in cabeceras_de_respuesta and re.search('ghost', cabeceras_de_respuesta['X-Powered-By'], re.IGNORECASE):
             print('Posible uso de Ghost')
+        else:
+            marcador = 1
+            for cabeceras in ghost_cabeceras:
+                if cabeceras in cabeceras_de_respuesta and marcador == 1:
+                    print('Posible uso de Ghost')
+                    marcador = 0
 
         urlRobots = url + '/' + 'robots.txt'
         response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=True)
