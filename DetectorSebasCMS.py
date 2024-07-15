@@ -27,12 +27,15 @@ def detectarCMS(url):
         response.raise_for_status()  # Asegura que la solicitud fue exitosa, solo se realiza una vez para asegurar que la pagina exista
         cabeceras_de_respuesta =  response.headers
         print('Analizando WordPress')
-        print(cabeceras_de_respuesta)
         #Analisis Cabeceras
         if 'Link' in cabeceras_de_respuesta and 'rel="https://api.w.org/' in cabeceras_de_respuesta['Link']:
-            print('Posible uso de WordPress')
+            return 'WordPress'
         elif 'X-Redirect-By' in cabeceras_de_respuesta and 'WordPress' in cabeceras_de_respuesta['X-Redirect-By']:
-            print('Posible uso de WordPress')
+            return 'WordPress'
+        elif 'X-Powered-By' in cabeceras_de_respuesta and re.search('wordpress', cabeceras_de_respuesta['X-Powered-By'], re.IGNORECASE):
+            return 'WordPress'
+        elif 'X-Powered-By' in cabeceras_de_respuesta and re.search('wp', cabeceras_de_respuesta['X-Powered-By'], re.IGNORECASE):
+            return 'WordPress'
         #Analiza robots.txt
         urlRobots = url + '/' + 'robots.txt'
         response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=True)
@@ -46,7 +49,7 @@ def detectarCMS(url):
         else: 
             with open('WordPressDirectorios.txt', 'r') as file:
                 urls = file.readlines()
-            urlsSeleccionadas = random.sample(urls, 30)
+            urlsSeleccionadas = random.sample(urls, 10)
             for pruebaUrl in urlsSeleccionadas:
                 pruebaUrl = pruebaUrl.strip()  # Eliminar espacios en blanco al principio y al final
                 urlDestino = url + '/' + pruebaUrl
@@ -59,15 +62,20 @@ def detectarCMS(url):
                         return 'WordPress'
         print('Analizando Drupal')
         #Analisis Cabeceras
-        if 'x-generators' in cabeceras_de_respuesta and 'Drupal' in cabeceras_de_respuesta['x-generator']:
-            print('Posible uso de Drupal')
-        elif 'x-drupal-dynamic-cache' in cabeceras_de_respuesta or 'x-drupal-cache' in cabeceras_de_respuesta:
-            print('Posible uso de Drupal')
+        drupal_cabeceras = [
+            'X-Drupal-Cache', 'X-Drupal-Dynamic-Cache', 'X-Drupal-Cache-Contexts',
+            'X-Drupal-Cache-Tags', 'X-Drupal-Cache-Max-Age', 'X-Drupal-Fast-404', 'X-Drupal-Route-Normalizer',
+            'X-Drupal-Quickedit', 'X-Drupal-Regions', 'X-Drupal-Theme', 'X-Drupal-Site']
+        if 'x-generator' in cabeceras_de_respuesta and 'Drupal' in cabeceras_de_respuesta['x-generator']:
+            return 'Drupal'
+        else:
+            for cabeceras in drupal_cabeceras:
+                if cabeceras in cabeceras_de_respuesta:
+                    return 'Drupal'
         urlRobots = url + '/' + 'robots.txt'
         response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=True)
         if 'core' in response.text or '.gitlab-ci' in response.text or 'composer' in response.text:
             return 'Drupal'
-        
         response = session.get(url, allow_redirects=False, headers = headers, verify=True)
         if soup.find('meta', {'name': 'generator', 'content': re.compile(r'Drupal ')}) or 'sites/default' in response.text:
             return 'Drupal'
@@ -88,9 +96,13 @@ def detectarCMS(url):
         print('Analizando Joomla')
         #Analisis cabeceras
         if 'X-Content-Encoded-By' in cabeceras_de_respuesta and re.search('joomla', cabeceras_de_respuesta['X-Content-Encoded-By'], re.IGNORECASE):
-            print('Posible uso de Joomla')
+            return 'Joomla'
         elif 'X-Powered-By' in cabeceras_de_respuesta and re.search('joomla', cabeceras_de_respuesta['X-Powered-By'], re.IGNORECASE):
-            print('Posible uso de Joomla')
+            return 'Joomla'
+        elif 'X-Generator' in cabeceras_de_respuesta and re.search('joomla', cabeceras_de_respuesta['X-Generator'], re.IGNORECASE):
+            return 'Joomla'
+        elif 'X-Joomla-Cache' in cabeceras_de_respuesta:
+            return 'Joomla'
 
         urlRobots = url + '/' + 'robots.txt'
         response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=True)
@@ -125,8 +137,13 @@ def detectarCMS(url):
                         return 'Joomla'
         print('Analizando Ghost')
         #Analisis cabeceras
+        ghost_cabeceras = ['Ghost-Age', 'Ghost-Cache', 'Ghost-Fastly']
         if 'X-Powered-By' in cabeceras_de_respuesta and re.search('ghost', cabeceras_de_respuesta['X-Powered-By'], re.IGNORECASE):
-            print('Posible uso de Ghost')
+            return 'Ghost'
+        else:
+            for cabeceras in ghost_cabeceras:
+                if cabeceras in cabeceras_de_respuesta:
+                    return 'Ghost'
 
         urlRobots = url + '/' + 'robots.txt'
         response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=True)
@@ -148,11 +165,12 @@ def detectarCMS(url):
                         return 'Ghost'
         print('Analizando PrestaShop')
         #Analisis Cabeceras
-        if 'X-Powered-By' in cabeceras_de_respuesta and re.search('prestashop', cabeceras_de_respuesta['X-Powered-By'], re.IGNORECASE):
-            print('Posible uso de PrestaShop')
+        if 'Powered-By' in cabeceras_de_respuesta and re.search('prestashop', cabeceras_de_respuesta['Powered-By'], re.IGNORECASE):
+            return 'PrestaShop'
         elif 'X-PrestaShop' in cabeceras_de_respuesta:
-            print('Posible uso de PrestaShop')
-
+            return 'PrestaShop'
+        elif 'Set-Cookie' in cabeceras_de_respuesta and re.search('prestashop', cabeceras_de_respuesta['Set-Cookie'], re.IGNORECASE):
+            return 'PrestaShop'
         urlRobots = url + '/' + 'robots.txt'
         response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=True)
         with open('PrestaShopRobots.txt', 'r') as file:
