@@ -2,11 +2,14 @@ import requests
 from bs4 import BeautifulSoup
 import random
 import re
+from difflib import SequenceMatcher
 session = requests.Session()
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3', 
             'Accept-Language': 'en-US,en;q=0.9',
             'Connection': 'keep-alive'}
 url = input("Ingresa una URL: ")
+def calcular_similitud(texto1, texto2):
+    return SequenceMatcher(None, texto1, texto2).ratio()
 def quitarDirectorio(url):
     # Verificar si la URL contiene un directorio
     if '/' in url:
@@ -49,17 +52,29 @@ def detectarCMS(url):
         else: 
             with open('WordPressDirectorios.txt', 'r') as file:
                 urls = file.readlines()
-            urlsSeleccionadas = random.sample(urls, 10)
+            urlsSeleccionadas = random.sample(urls, 30)
+            bandera = False
+            similitud = 1
+            verificacion_autenticidad = 0
             for pruebaUrl in urlsSeleccionadas:
                 pruebaUrl = pruebaUrl.strip()  # Eliminar espacios en blanco al principio y al final
                 urlDestino = url + '/' + pruebaUrl
                 response = session.get(urlDestino, allow_redirects=False, headers=headers, verify=True)
+                if bandera == True:
+                    similitud = calcular_similitud(response.text, past_response)
                 if response.history:
-                    if response.history[0].status_code == 200:
-                        return 'WordPress'
+                    if response.history[0].status_code == 200 and similitud<0.95:
+                        verificacion_autenticidad = verificacion_autenticidad + 1
+                        if verificacion_autenticidad == 2:
+                            return 'WordPress'
                 else:
-                    if response.status_code == 200:
-                        return 'WordPress'
+                    if response.status_code == 200 and similitud<0.95:
+                        verificacion_autenticidad = verificacion_autenticidad + 1
+                        if verificacion_autenticidad == 2:
+                            return 'WordPress'
+                if response.status_code == 200:
+                    bandera = True
+                    past_response = response.text
         print('Analizando Drupal')
         #Analisis Cabeceras
         drupal_cabeceras = [
@@ -83,16 +98,28 @@ def detectarCMS(url):
             with open('DrupalDirectorios.txt', 'r') as file:
                 urls = file.readlines()
             urlsSeleccionadas = random.sample(urls, 30)
+            bandera = False
+            similitud = 1
+            verificacion_autenticidad = 0
             for pruebaUrl in urlsSeleccionadas:
                 pruebaUrl = pruebaUrl.strip()  # Eliminar espacios en blanco al principio y al final
                 urlDestino = url + '/' + pruebaUrl
-                response = requests.get(urlDestino, allow_redirects=False, headers = headers, verify=True)
+                response = session.get(urlDestino, allow_redirects=False, headers=headers, verify=True)
+                if bandera == True:
+                    similitud = calcular_similitud(response.text, past_response)
                 if response.history:
-                    if response.history[0].status_code == 200:
-                        return 'Drupal'
+                    if response.history[0].status_code == 200 and similitud<0.95:
+                        verificacion_autenticidad = verificacion_autenticidad + 1
+                        if verificacion_autenticidad == 2:
+                            return 'Drupal'
                 else:
-                    if response.status_code == 200:
-                        return 'Drupal'
+                    if response.status_code == 200 and similitud<0.95:
+                        verificacion_autenticidad = verificacion_autenticidad + 1
+                        if verificacion_autenticidad == 2:
+                            return 'Drupal'
+                if response.status_code == 200:
+                    bandera = True
+                    past_response = response.text
         print('Analizando Joomla')
         #Analisis cabeceras
         if 'X-Content-Encoded-By' in cabeceras_de_respuesta and re.search('joomla', cabeceras_de_respuesta['X-Content-Encoded-By'], re.IGNORECASE):
@@ -113,11 +140,6 @@ def detectarCMS(url):
             if palabrasClave in response.text:
                 return 'Joomla'
         
-        urlRobots = url + '/' + 'robots.txt'
-        response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=True)
-        if 'core' in response.text or '.gitlab-ci' in response.text or 'composer' in response.text:
-            return 'Joomla'
-        
         response = session.get(url, allow_redirects=False, headers = headers, verify=True)
         if soup.find('meta', {'name': 'generator', 'content': re.compile(r'Joomla')}):
             return 'Joomla'
@@ -125,16 +147,28 @@ def detectarCMS(url):
             with open('JoomlaDirectorios.txt', 'r') as file:
                 urls = file.readlines()
             urlsSeleccionadas = random.sample(urls, 30)
+            bandera = False
+            similitud = 1
+            verificacion_autenticidad = 0
             for pruebaUrl in urlsSeleccionadas:
                 pruebaUrl = pruebaUrl.strip()  # Eliminar espacios en blanco al principio y al final
                 urlDestino = url + '/' + pruebaUrl
-                response = requests.get(urlDestino, allow_redirects=False, headers = headers, verify=True)
+                response = session.get(urlDestino, allow_redirects=False, headers=headers, verify=True)
+                if bandera == True:
+                    similitud = calcular_similitud(response.text, past_response)
                 if response.history:
-                    if response.history[0].status_code == 200:
-                        return 'Joomla'
+                    if response.history[0].status_code == 200 and similitud<0.95:
+                        verificacion_autenticidad = verificacion_autenticidad + 1
+                        if verificacion_autenticidad == 2:
+                            return 'Joomla'
                 else:
-                    if response.status_code == 200:
-                        return 'Joomla'
+                    if response.status_code == 200 and similitud<0.95:
+                        verificacion_autenticidad = verificacion_autenticidad + 1
+                        if verificacion_autenticidad == 2:
+                            return 'Joomla'
+                if response.status_code == 200:
+                    bandera = True
+                    past_response = response.text
         print('Analizando Ghost')
         #Analisis cabeceras
         ghost_cabeceras = ['Ghost-Age', 'Ghost-Cache', 'Ghost-Fastly']
@@ -160,7 +194,7 @@ def detectarCMS(url):
             for pruebaUrl in urlsSeleccionadas:
                 pruebaUrl = pruebaUrl.strip()  # Eliminar espacios en blanco al principio y al final
                 urlDestino = url + '/' + pruebaUrl
-                response = requests.get(urlDestino, allow_redirects=False, headers = headers, verify=True)
+                response = requests.get(urlDestino, allow_redirects=True, headers = headers, verify=True)
                 if 'ghost.io'in response.url:
                         return 'Ghost'
         print('Analizando PrestaShop')
@@ -187,16 +221,28 @@ def detectarCMS(url):
             with open('PrestaShopDirectorios.txt', 'r') as file:
                 urls = file.readlines()
             urlsSeleccionadas = random.sample(urls, 30)
+            bandera = False
+            similitud = 1
+            verificacion_autenticidad = 0
             for pruebaUrl in urlsSeleccionadas:
                 pruebaUrl = pruebaUrl.strip()  # Eliminar espacios en blanco al principio y al final
                 urlDestino = url + '/' + pruebaUrl
-                response = requests.get(urlDestino, allow_redirects=False, headers = headers, verify=True)
+                response = session.get(urlDestino, allow_redirects=False, headers=headers, verify=True)
+                if bandera == True:
+                    similitud = calcular_similitud(response.text, past_response)
                 if response.history:
-                    if response.history[0].status_code == 200:
-                        return 'PrestaShop'
+                    if response.history[0].status_code == 200 and similitud<0.95:
+                        verificacion_autenticidad = verificacion_autenticidad + 1
+                        if verificacion_autenticidad == 2:
+                            return 'PrestaShop'
                 else:
-                    if response.status_code == 200:
-                        return 'PrestaShop'
+                    if response.status_code == 200 and similitud<0.95:
+                        verificacion_autenticidad = verificacion_autenticidad + 1
+                        if verificacion_autenticidad == 2:
+                            return 'PrestaShop'
+                if response.status_code == 200:
+                    bandera = True
+                    past_response = response.text
         # Si no se detecta ningún CMS conocido
         return 'no esta programado para detectar el CMS de esta pagina'
     except requests.RequestException as error:
