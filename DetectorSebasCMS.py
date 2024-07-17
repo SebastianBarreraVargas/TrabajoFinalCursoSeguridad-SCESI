@@ -4,10 +4,14 @@ import random
 import re
 from difflib import SequenceMatcher
 session = requests.Session()
+verificacion = True
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3', 
             'Accept-Language': 'en-US,en;q=0.9',
             'Connection': 'keep-alive'}
 url = input("Ingresa una URL: ")
+if url.startswith("-w "):
+    verificacion = False
+    url = url.replace("-w ", "")
 def calcular_similitud(texto1, texto2):
     return SequenceMatcher(None, texto1, texto2).ratio()
 def quitarDirectorio(url):
@@ -26,7 +30,7 @@ def detectarCMS(url):
     try:
 
         # Realiza una solicitud HTTP GET a la URL
-        response = session.get(url, allow_redirects=False, headers = headers, verify=True)
+        response = session.get(url, allow_redirects=False, headers = headers, verify=verificacion)
         response.raise_for_status()  # Asegura que la solicitud fue exitosa, solo se realiza una vez para asegurar que la pagina exista
         cabeceras_de_respuesta =  response.headers
         print('Analizando WordPress')
@@ -41,11 +45,11 @@ def detectarCMS(url):
             return 'WordPress'
         #Analiza robots.txt
         urlRobots = url + '/' + 'robots.txt'
-        response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=True)
+        response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=verificacion)
         if 'wp-' in response.text or re.search('WordPress', response.text, re.IGNORECASE):
             return 'WordPress'
         # Analiza el contenido HTML de la página
-        response = session.get(url, allow_redirects=False, headers = headers, verify=True)
+        response = session.get(url, allow_redirects=False, headers = headers, verify=verificacion)
         soup = BeautifulSoup(response.content,'html.parser')
         if soup.find('meta', {'name': 'generator', 'content': re.compile(r'WordPress ')}):
             return 'WordPress'
@@ -59,7 +63,7 @@ def detectarCMS(url):
             for pruebaUrl in urlsSeleccionadas:
                 pruebaUrl = pruebaUrl.strip()  # Eliminar espacios en blanco al principio y al final
                 urlDestino = url + '/' + pruebaUrl
-                response = session.get(urlDestino, allow_redirects=False, headers=headers, verify=True)
+                response = session.get(urlDestino, allow_redirects=False, headers=headers, verify=verificacion)
                 if bandera == True:
                     similitud = calcular_similitud(response.text, past_response)
                 if response.history:
@@ -88,10 +92,10 @@ def detectarCMS(url):
                 if cabeceras in cabeceras_de_respuesta:
                     return 'Drupal'
         urlRobots = url + '/' + 'robots.txt'
-        response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=True)
+        response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=verificacion)
         if 'core' in response.text or '.gitlab-ci' in response.text or 'composer' in response.text:
             return 'Drupal'
-        response = session.get(url, allow_redirects=False, headers = headers, verify=True)
+        response = session.get(url, allow_redirects=False, headers = headers, verify=verificacion)
         if soup.find('meta', {'name': 'generator', 'content': re.compile(r'Drupal ')}) or 'sites/default' in response.text:
             return 'Drupal'
         else: 
@@ -104,7 +108,7 @@ def detectarCMS(url):
             for pruebaUrl in urlsSeleccionadas:
                 pruebaUrl = pruebaUrl.strip()  # Eliminar espacios en blanco al principio y al final
                 urlDestino = url + '/' + pruebaUrl
-                response = session.get(urlDestino, allow_redirects=False, headers=headers, verify=True)
+                response = session.get(urlDestino, allow_redirects=False, headers=headers, verify=verificacion)
                 if bandera == True:
                     similitud = calcular_similitud(response.text, past_response)
                 if response.history:
@@ -132,7 +136,7 @@ def detectarCMS(url):
             return 'Joomla'
 
         urlRobots = url + '/' + 'robots.txt'
-        response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=True)
+        response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=verificacion)
         with open('JoomlaRobots.txt', 'r') as file:
             textoPrueba = file.readlines()
         for palabrasClave in textoPrueba:
@@ -140,7 +144,7 @@ def detectarCMS(url):
             if palabrasClave in response.text:
                 return 'Joomla'
         
-        response = session.get(url, allow_redirects=False, headers = headers, verify=True)
+        response = session.get(url, allow_redirects=False, headers = headers, verify=verificacion)
         if soup.find('meta', {'name': 'generator', 'content': re.compile(r'Joomla')}):
             return 'Joomla'
         else: 
@@ -153,7 +157,7 @@ def detectarCMS(url):
             for pruebaUrl in urlsSeleccionadas:
                 pruebaUrl = pruebaUrl.strip()  # Eliminar espacios en blanco al principio y al final
                 urlDestino = url + '/' + pruebaUrl
-                response = session.get(urlDestino, allow_redirects=False, headers=headers, verify=True)
+                response = session.get(urlDestino, allow_redirects=False, headers=headers, verify=verificacion)
                 if bandera == True:
                     similitud = calcular_similitud(response.text, past_response)
                 if response.history:
@@ -180,11 +184,11 @@ def detectarCMS(url):
                     return 'Ghost'
 
         urlRobots = url + '/' + 'robots.txt'
-        response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=True)
+        response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=verificacion)
         if re.search('Ghost', response.text, re.IGNORECASE):
             return 'Ghost'
 
-        response = session.get(url, allow_redirects=False, headers = headers, verify=True)
+        response = session.get(url, allow_redirects=False, headers = headers, verify=verificacion)
         if soup.find('meta', {'name': 'generator', 'content': re.compile(r'Ghost')}):
             return 'Ghost'
         else:
@@ -194,7 +198,7 @@ def detectarCMS(url):
             for pruebaUrl in urlsSeleccionadas:
                 pruebaUrl = pruebaUrl.strip()  # Eliminar espacios en blanco al principio y al final
                 urlDestino = url + '/' + pruebaUrl
-                response = requests.get(urlDestino, allow_redirects=True, headers = headers, verify=True)
+                response = session.get(urlDestino, allow_redirects=True, headers = headers, verify=verificacion)
                 if 'ghost.io'in response.url:
                         return 'Ghost'
         print('Analizando PrestaShop')
@@ -206,7 +210,7 @@ def detectarCMS(url):
         elif 'Set-Cookie' in cabeceras_de_respuesta and re.search('prestashop', cabeceras_de_respuesta['Set-Cookie'], re.IGNORECASE):
             return 'PrestaShop'
         urlRobots = url + '/' + 'robots.txt'
-        response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=True)
+        response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=verificacion)
         with open('PrestaShopRobots.txt', 'r') as file:
             textoPrueba = file.readlines()
         for palabrasClave in textoPrueba:
@@ -214,7 +218,7 @@ def detectarCMS(url):
             if palabrasClave in response.text:
                 return 'PrestaShop'
 
-        response = session.get(url, allow_redirects=False, headers = headers, verify=True)
+        response = session.get(url, allow_redirects=False, headers = headers, verify=verificacion)
         if soup.find('meta', {'name': 'generator', 'content': re.compile(r'PrestaShop')}) or re.search('prestashop', response.text, re.IGNORECASE):
             return 'PrestaShop'
         else:
@@ -227,7 +231,7 @@ def detectarCMS(url):
             for pruebaUrl in urlsSeleccionadas:
                 pruebaUrl = pruebaUrl.strip()  # Eliminar espacios en blanco al principio y al final
                 urlDestino = url + '/' + pruebaUrl
-                response = session.get(urlDestino, allow_redirects=False, headers=headers, verify=True)
+                response = session.get(urlDestino, allow_redirects=False, headers=headers, verify=verificacion)
                 if bandera == True:
                     similitud = calcular_similitud(response.text, past_response)
                 if response.history:
