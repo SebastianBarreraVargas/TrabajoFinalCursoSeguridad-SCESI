@@ -3,15 +3,16 @@ from bs4 import BeautifulSoup
 import random
 import re
 from difflib import SequenceMatcher
+import sys
 session = requests.Session()
 verificacion = True
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3', 
             'Accept-Language': 'en-US,en;q=0.9',
             'Connection': 'keep-alive'}
-url = input("Ingresa una URL: ")
-if url.startswith("-w "):
+url = sys.argv[1]
+if sys.argv[1] == '-w':
     verificacion = False
-    url = url.replace("-w ", "")
+    url = sys.argv[2]
 def calcular_similitud(texto1, texto2):
     return SequenceMatcher(None, texto1, texto2).ratio()
 def quitarDirectorio(url):
