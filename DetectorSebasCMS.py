@@ -13,6 +13,11 @@ url = sys.argv[1]
 if sys.argv[1] == '-w':
     verificacion = False
     url = sys.argv[2]
+if sys.argv[1] == '-h':
+    with open('TextoAyuda.txt', 'r') as archivoAyuda:
+        contenido = archivoAyuda.read()
+        print(contenido)
+    sys.exit()
 def calcular_similitud(texto1, texto2):
     return SequenceMatcher(None, texto1, texto2).ratio()
 def quitarDirectorio(url):

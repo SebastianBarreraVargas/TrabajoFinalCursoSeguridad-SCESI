@@ -1,0 +1,28 @@
+## Instrucciones del programa
+* El programa esperara que usted ingrese un texto como argumento, el cual debe ser la url de la pagina de la que quiere conseguir su CMS o en su defecto un parametro aceptado.
+* La url debe tener la siguiente estructura:
+
+    * https://`tu_direccion_web`
+
+        o sino 
+
+    * http://`tu_direccion_web`
+
+      segun la url que elegiste lo requiera
+* El programa analizara los 5 CMS para los que esta programado y si su pagina a analizar usa uno de estos gestores de contenido se le devolvera el nombre de ese CMS.
+## Lista parametros
+-w
+* Si la pagina da una excepcion como la que se muestra en el recuadro de abajo le recomiendo usar el modo sin verificacion de certificados, al cual puede acceder usando `-w "tu_url"`, de esta forma no se solicitaran certificados a la pagina web. 
+
+    * `HTTPSConnectionPool(host='www.umss.edu.bo', port=443): Max retries exceeded with url: / (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1000)')))`
+-h
+* Muestra informacion que ayuda al usuario.
+## CMS soportados por el programa:
+
+SebasCMSDetector v1.0 soporta la siguiente lista de CMS:
+
+* Wordpress
+* Drupal
+* Joomla
+* Ghost
+* PrestaShop
