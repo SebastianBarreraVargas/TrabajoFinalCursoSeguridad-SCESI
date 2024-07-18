@@ -1,4 +1,5 @@
 ## Instrucciones del programa
+* El comando sera `detectorCMS <tu_url>`
 * El programa esperara que usted ingrese un texto como argumento, el cual debe ser la url de la pagina de la que quiere conseguir su CMS o en su defecto un parametro aceptado.
 * La url debe tener la siguiente estructura:
 
