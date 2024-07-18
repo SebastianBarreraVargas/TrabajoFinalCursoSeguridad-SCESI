@@ -14,7 +14,7 @@ if sys.argv[1] == '-w':
     verificacion = False
     url = sys.argv[2]
 if sys.argv[1] == '-h':
-    with open('TextoAyuda.txt', 'r') as archivoAyuda:
+    with open('/usr/lib/python3/dist-packages/DetectorCMS/TextoAyuda.txt', 'r') as archivoAyuda:
         contenido = archivoAyuda.read()
         print(contenido)
     sys.exit()
@@ -60,7 +60,7 @@ def detectarCMS(url):
         if soup.find('meta', {'name': 'generator', 'content': re.compile(r'WordPress ')}):
             return 'WordPress'
         else: 
-            with open('WordPressDirectorios.txt', 'r') as file:
+            with open('/usr/lib/python3/dist-packages/DetectorCMS/WordPressDirectorios.txt', 'r') as file:
                 urls = file.readlines()
             urlsSeleccionadas = random.sample(urls, 30)
             bandera = False
@@ -99,13 +99,13 @@ def detectarCMS(url):
                     return 'Drupal'
         urlRobots = url + '/' + 'robots.txt'
         response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=verificacion)
-        if 'core' in response.text or '.gitlab-ci' in response.text or 'composer' in response.text:
+        if '/core/' in response.text:
             return 'Drupal'
         response = session.get(url, allow_redirects=False, headers = headers, verify=verificacion)
         if soup.find('meta', {'name': 'generator', 'content': re.compile(r'Drupal ')}) or 'sites/default' in response.text:
             return 'Drupal'
         else: 
-            with open('DrupalDirectorios.txt', 'r') as file:
+            with open('/usr/lib/python3/dist-packages/DetectorCMS/DrupalDirectorios.txt', 'r') as file:
                 urls = file.readlines()
             urlsSeleccionadas = random.sample(urls, 30)
             bandera = False
@@ -143,18 +143,14 @@ def detectarCMS(url):
 
         urlRobots = url + '/' + 'robots.txt'
         response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=verificacion)
-        with open('JoomlaRobots.txt', 'r') as file:
-            textoPrueba = file.readlines()
-        for palabrasClave in textoPrueba:
-            palabrasClave = palabrasClave.strip()
-            if palabrasClave in response.text:
-                return 'Joomla'
+        if re.search('joomla', response.text, re.IGNORECASE):
+            return 'Joomla'
         
         response = session.get(url, allow_redirects=False, headers = headers, verify=verificacion)
         if soup.find('meta', {'name': 'generator', 'content': re.compile(r'Joomla')}):
             return 'Joomla'
         else: 
-            with open('JoomlaDirectorios.txt', 'r') as file:
+            with open('/usr/lib/python3/dist-packages/DetectorCMS/JoomlaDirectorios.txt', 'r') as file:
                 urls = file.readlines()
             urlsSeleccionadas = random.sample(urls, 30)
             bandera = False
@@ -198,7 +194,7 @@ def detectarCMS(url):
         if soup.find('meta', {'name': 'generator', 'content': re.compile(r'Ghost')}):
             return 'Ghost'
         else:
-            with open('GhostDirectorios.txt', 'r') as file:
+            with open('/usr/lib/python3/dist-packages/DetectorCMS/GhostDirectorios.txt', 'r') as file:
                 urls = file.readlines()
             urlsSeleccionadas = random.sample(urls, 30)
             for pruebaUrl in urlsSeleccionadas:
@@ -217,7 +213,7 @@ def detectarCMS(url):
             return 'PrestaShop'
         urlRobots = url + '/' + 'robots.txt'
         response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=verificacion)
-        with open('PrestaShopRobots.txt', 'r') as file:
+        with open('/usr/lib/python3/dist-packages/DetectorCMS/PrestaShopRobots.txt', 'r') as file:
             textoPrueba = file.readlines()
         for palabrasClave in textoPrueba:
             palabrasClave = palabrasClave.strip()
@@ -228,7 +224,7 @@ def detectarCMS(url):
         if soup.find('meta', {'name': 'generator', 'content': re.compile(r'PrestaShop')}) or re.search('prestashop', response.text, re.IGNORECASE):
             return 'PrestaShop'
         else:
-            with open('PrestaShopDirectorios.txt', 'r') as file:
+            with open('/usr/lib/python3/dist-packages/DetectorCMS/PrestaShopDirectorios.txt', 'r') as file:
                 urls = file.readlines()
             urlsSeleccionadas = random.sample(urls, 30)
             bandera = False
@@ -260,3 +256,4 @@ def detectarCMS(url):
         return None
 cms = detectarCMS(url)
 print(cms)
+sys.exit()
