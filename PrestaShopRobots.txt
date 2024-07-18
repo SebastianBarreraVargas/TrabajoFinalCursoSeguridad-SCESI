@@ -1,6 +1,4 @@
 PrestaShop
 prestashop
-translations
-localization
 /src/
 /mails/
