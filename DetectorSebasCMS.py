@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import random
 import re
 from difflib import SequenceMatcher
+import sys
 session = requests.Session()
 verificacion = True
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3', 
@@ -12,6 +13,11 @@ url = input("Ingresa una URL: ")
 if url.startswith("-w "):
     verificacion = False
     url = url.replace("-w ", "")
+if url.startswith("-h" or "-h " or "--help"):
+    with open('TextoAyuda.txt', 'r') as archivoAyuda:
+        contenido = archivoAyuda.read()
+        print(contenido)
+    sys.exit()
 def calcular_similitud(texto1, texto2):
     return SequenceMatcher(None, texto1, texto2).ratio()
 def quitarDirectorio(url):
@@ -93,7 +99,7 @@ def detectarCMS(url):
                     return 'Drupal'
         urlRobots = url + '/' + 'robots.txt'
         response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=verificacion)
-        if 'core' in response.text or '.gitlab-ci' in response.text or 'composer' in response.text:
+        if '/core/' in response.text:
             return 'Drupal'
         response = session.get(url, allow_redirects=False, headers = headers, verify=verificacion)
         if soup.find('meta', {'name': 'generator', 'content': re.compile(r'Drupal ')}) or 'sites/default' in response.text:
@@ -137,12 +143,8 @@ def detectarCMS(url):
 
         urlRobots = url + '/' + 'robots.txt'
         response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=verificacion)
-        with open('JoomlaRobots.txt', 'r') as file:
-            textoPrueba = file.readlines()
-        for palabrasClave in textoPrueba:
-            palabrasClave = palabrasClave.strip()
-            if palabrasClave in response.text:
-                return 'Joomla'
+        if re.search('joomla', response.text, re.IGNORECASE):
+            return 'Joomla'
         
         response = session.get(url, allow_redirects=False, headers = headers, verify=verificacion)
         if soup.find('meta', {'name': 'generator', 'content': re.compile(r'Joomla')}):

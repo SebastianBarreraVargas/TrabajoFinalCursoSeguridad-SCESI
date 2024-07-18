@@ -1,5 +1,0 @@
-Joomla
-installation
-components
-layouts
-libraries
