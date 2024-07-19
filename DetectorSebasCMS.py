@@ -187,7 +187,7 @@ def detectarCMS(url):
 
         urlRobots = url + '/' + 'robots.txt'
         response = session.get(urlRobots, allow_redirects=False, headers = headers, verify=verificacion)
-        if re.search('Ghost', response.text, re.IGNORECASE):
+        if re.search('/ghost/', response.text, re.IGNORECASE):
             return 'Ghost'
 
         response = session.get(url, allow_redirects=False, headers = headers, verify=verificacion)
