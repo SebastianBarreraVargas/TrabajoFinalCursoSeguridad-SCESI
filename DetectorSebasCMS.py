@@ -13,7 +13,7 @@ url = input("Ingresa una URL: ")
 if url.startswith("-w "):
     verificacion = False
     url = url.replace("-w ", "")
-if url.startswith("-h" or "-h " or "--help"):
+if url.startswith("-h" or "-h "):
     with open('TextoAyuda.txt', 'r') as archivoAyuda:
         contenido = archivoAyuda.read()
         print(contenido)
